@@ -1,78 +1,54 @@
-| Supported Targets | ESP32 | ESP32-C2 | ESP32-C3 | ESP32-C5 | ESP32-C6 | ESP32-C61 | ESP32-H2 | ESP32-P4 | ESP32-S2 | ESP32-S3 |
-| ----------------- | ----- | -------- | -------- | -------- | -------- | --------- | -------- | -------- | -------- | -------- |
+Estação Meteorológica IoT com ESP32, Display ST7735S e Publicação via MQTT
 
-# ESP-MQTT sample application
-(See the README.md file in the upper level 'examples' directory for more information about examples.)
 
-This example connects to the broker URI selected using `idf.py menuconfig` (using mqtt tcp transport) and as a demonstration subscribes/unsubscribes and send a message on certain topic.
-(Please note that the public broker is maintained by the community so may not be always available, for details please see this [disclaimer](https://iot.eclipse.org/getting-started/#sandboxes))
+Introdução
+A coleta e monitoramento de dados meteorológicos em tempo real é fundamental para aplicações agrícolas, ambientais e acadêmicas. No entanto, muitas soluções disponíveis são caras e pouco acessíveis.
+Este projeto propõe o desenvolvimento de uma estação meteorológica de baixo custo e conectada à Internet, capaz de medir temperatura, umidade, luminosidade, intensidade de chuva e temperatura ambiente com sensores de fácil aquisição. Os dados são exibidos localmente em um display LCD e enviados para um servidor MQTT, permitindo acesso remoto
 
-Note: If the URI equals `FROM_STDIN` then the broker address is read from stdin upon application startup (used for testing)
+Desenvolvimento
+A solução foi implementada utilizando o microcontrolador ESP32, programado com ESP-IDF e executando o FreeRTOS.
+Sensores do projeto: DHT11 (temperatura e umidade), LDR (luminosidade) ,Sensor de chuva (analógico) e  KY-028 (temperatura com termistor ).
+A exibição local utilizando um display LCD ST7735S, controlado via protocolo SPI.
+Para comunicação com a nuvem, foi implementado um cliente MQTT que publica dados no formato JSON para um broker na rede local. 
+O sistema realiza leituras a cada 5 segundos, atualiza a interface gráfica no display e envia os dados para consumo remoto.
 
-It uses ESP-MQTT library which implements mqtt client to connect to mqtt broker with MQTT version 5.
+Resultados
+O sistema foi capaz de:
+Coletar e exibir informações meteorológicas em tempo real e exibir no display.
+Publicar os dados de forma confiável em um servidor MQTT( Mosquitto ).
+Obter precisão suficiente para aplicações acadêmicas e de monitoramento local.
+Garantir comunicação estável via Wi-Fi, com reconexão automática em caso de falha.
+A interface visual no display permitiu acompanhamento local rápido, enquanto a publicação via MQTT possibilitou integração com outros sistemas e dashboards remotos.
 
-The more details about MQTT v5, please refer to [official website](https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.html)
+Conclusão
+A estação meteorológica desenvolvida atende aos objetivos de fornecer um sistema de baixo custo, confiável para coleta e transmissão de dados climáticos. A arquitetura modular e a escolha de protocolos amplamente utilizados permitem a expansão do projeto, incluindo novos sensores, armazenamento em nuvem, painéis solares e funcionalidades de alerta.O projeto se mostra adequado para uso educacional, pesquisa e aplicações práticas em campo.
 
-## How to use example
 
-### Hardware Required
+Descrição de como executar o projeto:
 
-This example can be executed on any ESP32 board, the only required interface is WiFi and connection to internet.
+- abra projeto pelo vscode
+- baixar e instalar a extensão ESP-IDF no VS-Code
+    segue link de instalação do mesmo: https://github.com/espressif/vscode-esp-idf-extension/blob/master/README.md
+- faça toda a montagem dos sensores no Esp32 , Build e grave o codigo no mesmo.
+- baixe e instale o app em seu celular o MQTT Broker
+    https://play.google.com/store/apps/details?id=in.naveens.mqttbroker&hl=pt_BR
+    - veja qual ip foi destinado a ele na rede wifi    
+    - configure um usuario e senha para que seja colocado no codigo, procure as informações abaixo no topo do codigo e as altere.
+        #define WIFI_SSID         "Sua WI-Fi"                   // Nome da sua rede Wi-Fi
+        #define WIFI_PASS         "Senha da WIFI"               // Senha da sua rede Wi-Fi
+        #define MQTT_BROKER_URI   "mqtt://IP_DO_MQTT_Broker:1883"     // Endereço do seu broker MQTT
+        #define MQTT_USER         "usuario"                   // Usuário do broker MQTT
+        #define MQTT_PASS         "senha"                   // Senha do broker MQTT
+    Obs: caso va usar o celular como ponto de acesso via chip , desative o 4g primeiro e abra o app para que o mesmo pegue o ip da rede interna.
+    
+- baixe e instale o app em seu celular IoT MQTT Panel
+    https://play.google.com/store/apps/details?id=snr.lab.iotmqttpanel.prod&hl=pt_BR
+    - Faça a conficuração do servidor MQTT colocando os dados pertinentes(ip, porta , usuario e senha)
+    - crie o dashboard no app colocando os dados a serem recebidos em formato " Payload is JSON Data " e acrescente o dado que sera recebido em JsonPath for subscribe:  temperatura, umidade, ky028, luminosidade ou chuva
+    - acrescente na opção tropic a informação a seguir:   /ifpe/ads/embarcados/esp32/station/data 
+    - escolha a opção de template que melhor lhe agradar seja grafico ou apenas exibir o valor desejado
 
-### Configure the project
+Notas: caso prefira usar um outro MQTT recomendo ultilidar o Mosquitto via docker. 
 
-* Open the project configuration menu (`idf.py menuconfig`)
-* Configure Wi-Fi or Ethernet under "Example Connection Configuration" menu. See "Establishing Wi-Fi or Ethernet Connection" section in [examples/protocols/README.md](../../README.md) for more details.
-* MQTT v5 protocol (`CONFIG_MQTT_PROTOCOL_5`) under "ESP-MQTT Configurations" menu is enabled by `sdkconfig.defaults`.
 
-### Build and Flash
 
-Build the project and flash it to the board, then run monitor tool to view serial output:
-
-```
-idf.py -p PORT flash monitor
-```
-
-(To exit the serial monitor, type ``Ctrl-]``.)
-
-See the Getting Started Guide for full steps to configure and use ESP-IDF to build projects.
-
-## Example Output
-
-```
-I (5119) esp_netif_handlers: example_connect: sta ip: 192.168.3.143, mask: 255.255.255.0, gw: 192.168.3.1
-I (5119) example_connect: Got IPv4 event: Interface "example_connect: sta" address: 192.168.3.143
-I (5619) example_connect: Got IPv6 event: Interface "example_connect: sta" address: fe80:0000:0000:0000:c64f:33ff:fe24:6645, type: ESP_IP6_ADDR_IS_LINK_LOCAL
-I (5619) example_connect: Connected to example_connect: sta
-I (5629) example_connect: - IPv4 address: 192.168.3.143
-I (5629) example_connect: - IPv6 address: fe80:0000:0000:0000:c64f:33ff:fe24:6645, type: ESP_IP6_ADDR_IS_LINK_LOCAL
-I (5649) MQTT5_EXAMPLE: Other event id:7
-W (6299) wifi:<ba-add>idx:0 (ifx:0, 34:29:12:43:c5:40), tid:7, ssn:0, winSize:64
-I (7439) MQTT5_EXAMPLE: MQTT_EVENT_CONNECTED
-I (7439) MQTT5_EXAMPLE: sent publish successful, msg_id=53118
-I (7439) MQTT5_EXAMPLE: sent subscribe successful, msg_id=41391
-I (7439) MQTT5_EXAMPLE: sent subscribe successful, msg_id=13695
-I (7449) MQTT5_EXAMPLE: sent unsubscribe successful, msg_id=55594
-I (7649) mqtt5_client: MQTT_MSG_TYPE_PUBACK return code is -1
-I (7649) MQTT5_EXAMPLE: MQTT_EVENT_PUBLISHED, msg_id=53118
-I (8039) mqtt5_client: MQTT_MSG_TYPE_SUBACK return code is 0
-I (8049) MQTT5_EXAMPLE: MQTT_EVENT_SUBSCRIBED, msg_id=41391
-I (8049) MQTT5_EXAMPLE: sent publish successful, msg_id=0
-I (8059) mqtt5_client: MQTT_MSG_TYPE_SUBACK return code is 2
-I (8059) MQTT5_EXAMPLE: MQTT_EVENT_SUBSCRIBED, msg_id=13695
-I (8069) MQTT5_EXAMPLE: sent publish successful, msg_id=0
-I (8079) MQTT5_EXAMPLE: MQTT_EVENT_DATA
-I (8079) MQTT5_EXAMPLE: key is board, value is esp32
-I (8079) MQTT5_EXAMPLE: key is u, value is user
-I (8089) MQTT5_EXAMPLE: key is p, value is password
-I (8089) MQTT5_EXAMPLE: payload_format_indicator is 1
-I (8099) MQTT5_EXAMPLE: response_topic is /topic/test/response
-I (8109) MQTT5_EXAMPLE: correlation_data is 123456
-I (8109) MQTT5_EXAMPLE: content_type is 
-I (8119) MQTT5_EXAMPLE: TOPIC=/topic/qos1
-I (8119) MQTT5_EXAMPLE: DATA=data_3
-I (8129) mqtt5_client: MQTT_MSG_TYPE_UNSUBACK return code is 0
-I (8129) MQTT5_EXAMPLE: MQTT_EVENT_UNSUBSCRIBED, msg_id=55594
-I (8139) mqtt_client: Client asked to disconnect
-I (9159) MQTT5_EXAMPLE: MQTT_EVENT_DISCONNECTED
-```
