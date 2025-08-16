@@ -45,7 +45,6 @@ Descrição de como executar o projeto:
  '  3. Instalar no Windows
         1 - Baixe o instalador oficial:
             https://mosquitto.org/download/
-
         Instale o Mosquitto (marque a opção para instalar como serviço).
         Após a instalação, o Mosquitto pode ser iniciado pelo Serviços do Windows ou pelo Prompt de Comando:
         mosquitto
@@ -54,12 +53,10 @@ Descrição de como executar o projeto:
         mosquitto_sub -h localhost -t test
         Abrir outro terminal para publisher:
         mosquitto_pub -h localhost -t test -m "Teste MQTT no Windows!"
-
-        2 -  Instalar com Docker (opcional)
+   2 -  Instalar com Docker (opcional)
         Se preferir rodar isolado:
-        docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto  
-        
-         
+        docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto
+   
 - baixe e instale o app em seu celular IoT MQTT Panel
     https://play.google.com/store/apps/details?id=snr.lab.iotmqttpanel.prod&hl=pt_BR
     - Faça a conficuração do servidor MQTT colocando os dados pertinentes(ip, porta , usuario e senha)
