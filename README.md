@@ -30,7 +30,8 @@ Descrição de como executar o projeto:
 - baixar e instalar a extensão ESP-IDF no VS-Code
     segue link de instalação do mesmo: https://github.com/espressif/vscode-esp-idf-extension/blob/master/README.md
 - faça toda a montagem dos sensores no Esp32 , Build e grave o codigo no mesmo.
-- baixe e instale o app em seu celular o MQTT Broker
+- baixe e instale o app em seu celular o MQTT Broker ou instale o MQTT mosquito via docker
+ - 1 - usar APP MQTT BROKER  
     https://play.google.com/store/apps/details?id=in.naveens.mqttbroker&hl=pt_BR
     - veja qual ip foi destinado a ele na rede wifi    
     - configure um usuario e senha para que seja colocado no codigo, procure as informações abaixo no topo do codigo e as altere.
@@ -39,8 +40,26 @@ Descrição de como executar o projeto:
         #define MQTT_BROKER_URI   "mqtt://IP_DO_MQTT_Broker:1883"     // Endereço do seu broker MQTT
         #define MQTT_USER         "usuario"                   // Usuário do broker MQTT
         #define MQTT_PASS         "senha"                   // Senha do broker MQTT
-    Obs: caso va usar o celular como ponto de acesso via chip , desative o 4g primeiro e abra o app para que o mesmo pegue o ip da rede interna.
-    
+    Obs: caso va usar o celular como ponto de acesso o MQTT broker não funciona adequadamente
+ - 2 - Usar MQTT Mosquitto
+ '  3. Instalar no Windows
+        1 - Baixe o instalador oficial:
+            https://mosquitto.org/download/
+
+        Instale o Mosquitto (marque a opção para instalar como serviço).
+        Após a instalação, o Mosquitto pode ser iniciado pelo Serviços do Windows ou pelo Prompt de Comando:
+        mosquitto
+        Para testar, use também os clientes:
+        Abrir um terminal para subscriber:
+        mosquitto_sub -h localhost -t test
+        Abrir outro terminal para publisher:
+        mosquitto_pub -h localhost -t test -m "Teste MQTT no Windows!"
+
+        2 -  Instalar com Docker (opcional)
+        Se preferir rodar isolado:
+        docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto  
+        
+         
 - baixe e instale o app em seu celular IoT MQTT Panel
     https://play.google.com/store/apps/details?id=snr.lab.iotmqttpanel.prod&hl=pt_BR
     - Faça a conficuração do servidor MQTT colocando os dados pertinentes(ip, porta , usuario e senha)
